@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>生活管家</title>
+    <!-- PWA 相关元标签 -->
+    <meta name="theme-color" content="#1677ff">
+    <meta name="description" content="生活管家 - 轻松管理您的水费、电费、燃气费等生活缴费">
+    <!-- iOS 设备特定标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="生活管家">
+    <!-- 应用图标 -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231677ff;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23722ED1;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23grad1)'/%3E%3Cpath d='M400 256L256 128L112 256V400H400V256Z' fill='white'/%3E%3Cpath d='M256 128V256' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M256 256V400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M112 320H400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Crect x='176' y='280' width='160' height='80' rx='8' fill='%23f0f0f0'/%3E%3Cline x1='192' y1='304' x2='320' y2='304' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='320' x2='304' y2='320' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='336' x2='288' y2='336' stroke='%231677ff' stroke-width='4'/%3E%3C/svg%3E" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231677ff;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23722ED1;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23grad1)'/%3E%3Cpath d='M400 256L256 128L112 256V400H400V256Z' fill='white'/%3E%3Cpath d='M256 128V256' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M256 256V400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M112 320H400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Crect x='176' y='280' width='160' height='80' rx='8' fill='%23f0f0f0'/%3E%3Cline x1='192' y1='304' x2='320' y2='304' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='320' x2='304' y2='320' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='336' x2='288' y2='336' stroke='%231677ff' stroke-width='4'/%3E%3C/svg%3E">
+    <!-- 资源加载脚本 -->
+    <script>
+        // 检测网络状态
+        function isOnline() {
+            return navigator.onLine;
+        }
+        
+        // 动态加载资源
+        function loadResources() {
+            const isConnected = isOnline();
+            
+            // 加载Excel库
+            const xlsxScript = document.createElement('script');
+            xlsxScript.src = isConnected ? 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js' : 'assets/js/xlsx.full.min.js';
+            document.head.appendChild(xlsxScript);
+            
+            // 加载Font Awesome
+            const fontAwesomeLink = document.createElement('link');
+            fontAwesomeLink.rel = 'stylesheet';
+            fontAwesomeLink.href = isConnected ? 'https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css' : 'assets/css/font-awesome.min.css';
+            document.head.appendChild(fontAwesomeLink);
+            
+            // 加载Chart.js
+            const chartScript = document.createElement('script');
+            chartScript.src = isConnected ? 'https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js' : 'assets/js/chart.umd.min.js';
+            document.head.appendChild(chartScript);
+            
+            // 加载Tailwind CSS
+            if (isConnected) {
+                // 在线模式：使用CDN
+                const tailwindScript = document.createElement('script');
+                tailwindScript.src = 'https://cdn.tailwindcss.com';
+                tailwindScript.onload = function() {
+                    if (typeof tailwind !== 'undefined') {
+                        tailwind.config = {
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        water: '#1677ff',
+                                        electricity: '#FF7D00',
+                                        gas: '#FF4D4F',
+                                        property: '#00B42A',
+                                        parking: '#722ED1',
+                                        primary: '#1677ff',
+                                        secondary: '#722ED1',
+                                        up: '#FF4D4F',
+                                        down: '#00B42A',
+                                        neutral: '#6B7280'
+                                    },
+                                    fontFamily: {
+                                        inter: ['Inter', 'system-ui', 'sans-serif']
+                                    }
+                                }
+                            }
+                        };
+                    }
+                };
+                document.head.appendChild(tailwindScript);
+            } else {
+                // 离线模式：使用本地样式
+                const styleLink = document.createElement('link');
+                styleLink.rel = 'stylesheet';
+                styleLink.href = 'assets/css/tailwind.css';
+                document.head.appendChild(styleLink);
+            }
+        }
+        
+        // 页面加载时加载资源
+        window.addEventListener('load', loadResources);
+        
+        // 网络状态变化时重新加载资源
+        window.addEventListener('online', loadResources);
+        window.addEventListener('offline', loadResources);
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .card { @apply bg-white rounded-2xl shadow-sm border border-gray-100/80 overflow-hidden; }
+            .btn-filter { @apply rounded-xl px-2.5 py-1 text-xs transition-all whitespace-nowrap flex-shrink-0; }
+            .btn-active { @apply bg-primary text-white !important; }
+            .page { @apply hidden; }
+            .page.active { @apply block; }
+            .nav-item { @apply flex flex-col items-center gap-1 text-gray-400 cursor-pointer transition-all px-3 py-1.5 rounded-xl; }
+            .nav-item.active { @apply scale-110 font-semibold; }
+            .nav-item.active.home { @apply text-water bg-blue-50; }
+            .nav-item.active.chart { @apply text-electricity bg-orange-50; }
+            .nav-item.active.record { @apply text-gas bg-red-50; }
+            .nav-item.active.setting { @apply text-parking bg-purple-50; }
+
+            .text-up { color: #FF4D4F; }
+            .text-down { color: #00B42A; }
+            .text-neutral { color: #6B7280; }
+
+            .ios-select {
+                @apply rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none bg-white text-gray-800;
+                -webkit-appearance: none;
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 16px;
+                padding-right: 40px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+                transition: all 0.2s ease;
+            }
+            .ios-select:focus {
+                @apply border-primary;
+                box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+            }
+            .ios-select:active {
+                transform: scale(0.98);
+            }
+            .ios-input {
+                @apply rounded-xl border border-gray-200 px-3 py-2.5 outline-none text-gray-800;
+            }
+            .ios-modal {
+                @apply bg-white rounded-3xl shadow-xl w-[85%] max-w-sm p-6;
+            }
+            .ios-btn {
+                @apply rounded-xl py-2.5 text-sm font-medium;
+            }
+            
+            /* 动画效果 */
+            .fade-in {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            
+            .slide-up {
+                animation: slideUp 0.3s ease-out;
+            }
+            
+            .slide-down {
+                animation: slideDown 0.3s ease-out;
+            }
+            
+            .slide-left {
+                animation: slideLeft 0.3s ease-out;
+            }
+            
+            .slide-right {
+                animation: slideRight 0.3s ease-out;
+            }
+            
+            .scale-in {
+                animation: scaleIn 0.2s ease-out;
+            }
+            
+            .scale-out {
+                animation: scaleOut 0.2s ease-in;
+            }
+            
+            .pulse {
+                animation: pulse 1.5s infinite;
+            }
+            
+            .shake {
+                animation: shake 0.5s ease-in-out;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            
+            @keyframes slideDown {
+                from { transform: translateY(-20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            
+            @keyframes slideLeft {
+                from { transform: translateX(20px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideRight {
+                from { transform: translateX(-20px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes scaleIn {
+                from { transform: scale(0.95); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            
+            @keyframes scaleOut {
+                from { transform: scale(1); opacity: 1; }
+                to { transform: scale(0.95); opacity: 0; }
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+            
+            /* 加载动画 */
+            .loading {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 2px solid rgba(255,255,255,0.3);
+                border-radius: 50%;
+                border-top-color: #fff;
+                animation: spin 1s ease-in-out infinite;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        }
+    </style>
+    
+    <!-- 模块文件 -->
+    <script src="config/config.js"></script>
+    <script src="utils/utils.js"></script>
+    <script src="data/dataManager.js"></script>
+    <script src="charts/chartManager.js"></script>
+    <script src="ui/uiManager.js"></script>
+    <script src="export/exportManager.js"></script>
+    <script src="app.js"></script>
+    <!-- 注册 Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(registration) {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden font-inter">
+    <!-- 加载动画 -->
+    <div id="loading-screen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="relative w-1/4 h-1/4 max-w-32 max-h-32">
+            <div class="absolute inset-0 flex items-center justify-center">
+                <svg width="100%" height="100%" viewBox="0 0 512 512">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#1677ff;stop-opacity:1"/>
+                            <stop offset="25%" style="stop-color:#722ED1;stop-opacity:1"/>
+                            <stop offset="50%" style="stop-color:#F759AB;stop-opacity:1"/>
+                            <stop offset="75%" style="stop-color:#F5222D;stop-opacity:1"/>
+                            <stop offset="100%" style="stop-color:#1677ff;stop-opacity:1"/>
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#1677ff;stop-opacity:0.8"/>
+                            <stop offset="100%" style="stop-color:#722ED1;stop-opacity:0.8"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="256" cy="256" r="240" fill="url(#grad1)"/>
+                    <circle cx="256" cy="256" r="200" fill="white"/>
+                    <path d="M380 256L256 140L132 256V360H380V256Z" fill="url(#grad2)"/>
+                    <path d="M256 140V256" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M256 256V360" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M132 300H380" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                    <rect x="166" y="260" width="180" height="80" rx="6" fill="rgba(255,255,255,0.8)"/>
+                    <line x1="182" y1="284" x2="338" y2="284" stroke="#1677ff" stroke-width="3"/>
+                    <line x1="182" y1="300" x2="320" y2="300" stroke="#1677ff" stroke-width="3"/>
+                    <line x1="182" y1="316" x2="304" y2="316" stroke="#1677ff" stroke-width="3"/>
+                </svg>
+            </div>
+            <div class="absolute inset-0 border-4 border-transparent border-t-primary border-r-primary/70 border-b-primary/50 border-l-primary/30 rounded-full animate-spin" style="animation-duration: 1s;"></div>
+            <div class="absolute inset-2 border-2 border-transparent border-t-secondary border-r-secondary/70 border-b-secondary/50 border-l-secondary/30 rounded-full animate-spin" style="animation-duration: 1.5s; animation-direction: reverse;"></div>
+        </div>
+    </div>
+<div id="app" class="max-w-md mx-auto bg-white h-screen flex flex-col relative">
+    <header class="sticky top-0 bg-white z-10 px-5 pt-5 pb-3 flex justify-between items-center">
+        <div>
+            <h1 id="pageTitle" class="text-[22px] font-bold text-gray-900">生活管家</h1>
+        </div>
+        <div class="flex gap-2 mt-1 items-center">
+            <div class="flex-2">
+                <!-- 隐藏原来的select元素 -->
+                <select id="yearFilter" class="hidden"></select>
+                <!-- 新的年份选择器UI -->
+                <div id="yearSelector" class="relative">
+                    <div id="yearDisplay" class="ios-select py-2 px-3 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap">
+                        2026年度
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1">
+                <!-- 隐藏原来的select元素 -->
+                <select id="monthFilter" class="hidden"></select>
+                <!-- 新的月份选择器UI -->
+                <div id="monthSelector" class="relative">
+                    <div id="monthDisplay" class="ios-select py-2 px-3 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap">
+                        4月
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 年份选择器弹出层 -->
+        <div id="yearPicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <button id="yearCancel" class="text-gray-500">取消</button>
+                    <h3 class="font-medium">选择年份</h3>
+                    <button id="yearConfirm" class="text-primary">确定</button>
+                </div>
+                <div class="max-h-60 overflow-y-auto py-4">
+                    <div id="yearList" class="flex flex-col items-center space-y-4">
+                        <!-- 年份选项将通过JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 月份选择器弹出层 -->
+        <div id="monthPicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <button id="monthCancel" class="text-gray-500">取消</button>
+                    <h3 class="font-medium">选择月份</h3>
+                    <button id="monthConfirm" class="text-primary">确定</button>
+                </div>
+                <div class="max-h-60 overflow-y-auto py-4">
+                    <div id="monthList" class="flex flex-col items-center space-y-4">
+                        <!-- 月份选项将通过JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 px-4 pb-4 overflow-y-auto">
+        <section id="dashboardPage" class="page pt-2">
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div id="waterModule" class="card p-4 bg-blue-50/60">
+                    <p class="text-xs text-water font-medium">本月水费</p>
+                    <p id="monthWaterCost" class="text-2xl font-bold text-water mt-1">¥0.00</p>
+                    <div class="flex gap-3 mt-1 text-xs">
+                        <span id="waterMonthCompare" class="text-down">—</span>
+                        <span id="waterYearCompare" class="text-neutral">—</span>
+                    </div>
+                </div>
+                <div id="electricityModule" class="card p-4 bg-orange-50/60">
+                    <p class="text-xs text-electricity font-medium">本月电费</p>
+                    <p id="monthElecCost" class="text-2xl font-bold text-electricity mt-1">¥0.00</p>
+                    <div class="flex gap-3 mt-1 text-xs">
+                        <span id="elecMonthCompare" class="text-down">—</span>
+                        <span id="elecYearCompare" class="text-neutral">—</span>
+                    </div>
+                </div>
+                <div id="gasModule" class="card p-4 bg-red-50/60">
+                    <p class="text-xs text-gas font-medium">本月燃气费</p>
+                    <p id="monthGasCost" class="text-2xl font-bold text-gas mt-1">¥0.00</p>
+                    <div class="flex gap-3 mt-1 text-xs">
+                        <span id="gasMonthCompare" class="text-down">—</span>
+                        <span id="gasYearCompare" class="text-neutral">—</span>
+                    </div>
+                </div>
+                <div id="propertyModule" class="card p-4 bg-green-50/60">
+                    <p class="text-xs text-property font-medium">本月物业费</p>
+                    <p id="monthPropertyCost" class="text-2xl font-bold text-property mt-1">¥0.00</p>
+                    <div class="flex gap-3 mt-1 text-xs">
+                        <span id="propertyMonthCompare" class="text-down">—</span>
+                        <span id="propertyYearCompare" class="text-neutral">—</span>
+                    </div>
+                </div>
+                <div id="parkingModule" class="card p-4 bg-purple-50/60 col-span-2">
+                    <p class="text-xs text-parking font-medium">本月停车费</p>
+                    <p id="monthParkingCost" class="text-2xl font-bold text-parking mt-1">¥0.00</p>
+                    <div class="flex gap-3 mt-1 text-xs">
+                        <span id="parkingMonthCompare" class="text-down">—</span>
+                        <span id="parkingYearCompare" class="text-neutral">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h2 class="text-base font-bold mb-3">年度用量汇总</h2>
+                <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                    <div>
+                        <p class="text-xs text-water">用水量</p>
+                        <p id="yearWaterUsage" class="font-bold text-water">0.00 m³</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-electricity">用电量</p>
+                        <p id="yearElecUsage" class="font-bold text-electricity">0.00 kWh</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gas">用气量</p>
+                        <p id="yearGasUsage" class="font-bold text-gas">0.00 m³</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h2 class="text-base font-bold mb-3">年度支出</h2>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="p-2 bg-gray-50 rounded-xl">水费：<span id="yearWaterTotal" class="text-water font-medium">¥0.00</span></div>
+                    <div class="p-2 bg-gray-50 rounded-xl">电费：<span id="yearElecTotal" class="text-electricity font-medium">¥0.00</span></div>
+                    <div class="p-2 bg-gray-50 rounded-xl">燃气：<span id="yearGasTotal" class="text-gas font-medium">¥0.00</span></div>
+                    <div class="p-2 bg-gray-50 rounded-xl">物业：<span id="yearPropertyTotal" class="text-property font-medium">¥0.00</span></div>
+                    <div class="p-2 bg-gray-50 rounded-xl">停车：<span id="yearParkingTotal" class="text-parking font-medium">¥0.00</span></div>
+                    <div class="p-2 bg-gray-50 rounded-xl">合计：<span id="yearTotalCost" class="text-primary font-bold">¥0.00</span></div>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-4 bg-gradient-to-r from-blue-50/40 to-purple-50/40">
+                <h2 class="text-base font-bold mb-3">参考单价</h2>
+                <div class="space-y-2 text-xs">
+                    <p class="text-water">💧 水费：2.80 元/m³ + 污水 0.85 = <b>3.65 元/m³</b></p>
+                    <p class="text-electricity">⚡ 电价：高峰 0.8282 / 平段 0.5685 / 低谷 0.3088 元/kWh</p>
+                    <p class="text-gas">🔥 燃气：<b>3.50 元/m³</b></p>
+                    <p class="text-property">🏠 物业费：按面积核算，均价约 1.2~1.8 元/㎡/月</p>
+                    <p class="text-parking">🚗 停车费：小区 150~300 元/月，路边 5~10 元/次</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="chartsPage" class="page pt-2">
+            <div class="card p-4 mb-4">
+                <div class="flex justify-between items-center mb-3">
+                    <!-- <h2 class="text-base font-bold">数据统计</h2> -->
+                    <div class="flex gap-2 items-center">
+                        <!-- 隐藏原来的select元素 -->
+                        <select id="chartYearFilter" class="hidden"></select>
+                        <!-- 新的年份选择器UI -->
+                        <div id="chartYearSelector" class="relative">
+                            <div id="chartYearDisplay" class="ios-select py-1.5 px-2 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap text-sm">
+                                2026年
+                            </div>
+                        </div>
+                        
+                        <!-- 隐藏原来的select元素 -->
+                        <select id="chartMonthFilter" class="hidden"></select>
+                        <!-- 新的月份选择器UI -->
+                        <div id="chartMonthSelector" class="relative">
+                            <div id="chartMonthDisplay" class="ios-select py-1.5 px-2 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap text-sm">
+                                全部月份
+                            </div>
+                        </div>
+                        
+                        <!-- 隐藏原来的select元素 -->
+                        <select id="chartStyle" class="hidden">
+                            <option value="bar">柱状图</option>
+                            <option value="line">折线图</option>
+                            <option value="curve">曲线图</option>
+                        </select>
+                        <!-- 新的图表类型选择器UI -->
+                        <div id="chartStyleSelector" class="relative">
+                            <div id="chartStyleDisplay" class="ios-select py-1.5 px-2 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap text-sm">
+                                柱状图
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 图表年份选择器弹出层 -->
+                    <div id="chartYearPicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+                        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                            <div class="flex justify-between items-center p-4 border-b">
+                                <button id="chartYearCancel" class="text-gray-500">取消</button>
+                                <h3 class="font-medium">选择年份</h3>
+                                <button id="chartYearConfirm" class="text-primary">确定</button>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto py-4">
+                                <div id="chartYearList" class="flex flex-col items-center space-y-4">
+                                    <!-- 年份选项将通过JS动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 图表月份选择器弹出层 -->
+                    <div id="chartMonthPicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+                        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                            <div class="flex justify-between items-center p-4 border-b">
+                                <button id="chartMonthCancel" class="text-gray-500">取消</button>
+                                <h3 class="font-medium">选择月份</h3>
+                                <button id="chartMonthConfirm" class="text-primary">确定</button>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto py-4">
+                                <div id="chartMonthList" class="flex flex-col items-center space-y-4">
+                                    <!-- 月份选项将通过JS动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 图表类型选择器弹出层 -->
+                    <div id="chartStylePicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+                        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                            <div class="flex justify-between items-center p-4 border-b">
+                                <button id="chartStyleCancel" class="text-gray-500">取消</button>
+                                <h3 class="font-medium">选择图表类型</h3>
+                                <button id="chartStyleConfirm" class="text-primary">确定</button>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto py-4">
+                                <div id="chartStyleList" class="flex flex-col items-center space-y-4">
+                                    <!-- 图表类型选项将通过JS动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-1.5 mb-3 flex-wrap pb-1">
+                    <button data-filter="all" class="btn-filter btn-active">全部</button>
+                    <button data-filter="water" class="btn-filter">水费</button>
+                    <button data-filter="electricity" class="btn-filter">电费</button>
+                    <button data-filter="gas" class="btn-filter">燃气</button>
+                    <button data-filter="property" class="btn-filter">物业</button>
+                    <button data-filter="parking" class="btn-filter">停车</button>
+                    <button data-filter="total" class="btn-filter">总费用</button>
+                </div>
+                <div class="w-full h-64">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="recordsPage" class="page pt-2">
+            <div class="card p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <!-- <h2 class="text-base font-bold">历史记录</h2> -->
+                </div>
+
+                <div class="flex items-center gap-2 mb-3">
+                    <!-- 隐藏原来的select元素 -->
+                    <select id="recordYearFilter" class="hidden">
+                        <option value="all">全部年份</option>
+                    </select>
+                    <!-- 新的年份选择器UI -->
+                    <div id="recordYearSelector" class="relative flex-1">
+                        <div id="recordYearDisplay" class="ios-select py-2 px-3 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap">
+                            全部年份
+                        </div>
+                    </div>
+                    
+                    <!-- 隐藏原来的select元素 -->
+                    <select id="recordMonthFilter" class="hidden">
+                        <option value="all">全部月份</option>
+                    </select>
+                    <!-- 新的月份选择器UI -->
+                    <div id="recordMonthSelector" class="relative flex-1">
+                        <div id="recordMonthDisplay" class="ios-select py-2 px-3 rounded-lg border border-gray-200 bg-white cursor-pointer whitespace-nowrap">
+                            全部月份
+                        </div>
+                    </div>
+                    
+                    <button id="addBtn" class="bg-primary text-white rounded-xl px-3 py-2 text-sm whitespace-nowrap">
+                        <i class="fa fa-plus mr-1"></i>添加
+                    </button>
+                </div>
+                
+                <!-- 记录年份选择器弹出层 -->
+                <div id="recordYearPicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+                    <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                        <div class="flex justify-between items-center p-4 border-b">
+                            <button id="recordYearCancel" class="text-gray-500">取消</button>
+                            <h3 class="font-medium">选择年份</h3>
+                            <button id="recordYearConfirm" class="text-primary">确定</button>
+                        </div>
+                        <div class="max-h-60 overflow-y-auto py-4">
+                            <div id="recordYearList" class="flex flex-col items-center space-y-4">
+                                <!-- 年份选项将通过JS动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 记录月份选择器弹出层 -->
+                <div id="recordMonthPicker" class="fixed inset-0 bg-black/50 z-50 hidden">
+                    <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl">
+                        <div class="flex justify-between items-center p-4 border-b">
+                            <button id="recordMonthCancel" class="text-gray-500">取消</button>
+                            <h3 class="font-medium">选择月份</h3>
+                            <button id="recordMonthConfirm" class="text-primary">确定</button>
+                        </div>
+                        <div class="max-h-60 overflow-y-auto py-4">
+                            <div id="recordMonthList" class="flex flex-col items-center space-y-4">
+                                <!-- 月份选项将通过JS动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-1.5 mb-3 overflow-x-auto pb-1">
+                    <button data-f="all" class="btn-filter btn-active">全部</button>
+                    <button data-f="water" class="btn-filter">水费</button>
+                    <button data-f="electricity" class="btn-filter">电费</button>
+                    <button data-f="gas" class="btn-filter">燃气</button>
+                    <button data-f="property" class="btn-filter">物业</button>
+                    <button data-f="parking" class="btn-filter">停车</button>
+                </div>
+
+                <div id="recordList" class="space-y-3">
+                    <div class="text-center py-8 text-gray-400"><i class="fa fa-file-text-o text-2xl mb-2"></i><p>暂无记录</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="settingsPage" class="page pt-2">
+            <div class="card p-4 mb-4">
+                <!-- 通用功能 -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">通用功能</h3>
+                    <div class="bg-white rounded-xl overflow-hidden">
+                        <button id="moduleToggleBtn" class="w-full flex items-center justify-between p-4 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fa fa-sliders mr-3 text-yellow-500"></i>
+                                <span>首页模块显示开关</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </button>
+                        <button id="exportExcelBtn" class="w-full flex items-center justify-between p-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-download mr-3 text-green-500"></i>
+                                <span>导出所有数据为 Excel</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 缴费周期设置 -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">缴费周期设置</h3>
+                    <div class="bg-white rounded-xl overflow-hidden">
+                        <div id="property-item" class="w-full flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3 text-property">🏠</div>
+                                <div>
+                                    <div class="text-base font-medium">物业费</div>
+                                    <div class="text-xs text-gray-500">计费周期</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="text-right">
+                                    <div id="property-remaining" class="text-xs text-gray-500">剩余天数：-</div>
+                                    <div id="property-days" class="text-property text-sm">未设置</div>
+                                </div>
+                                <i class="fa fa-chevron-right text-gray-400 text-xs ml-2"></i>
+                            </div>
+                        </div>
+                        <div id="parking-item" class="w-full flex items-center justify-between p-4 cursor-pointer">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3 text-parking">🚗</div>
+                                <div>
+                                    <div class="text-base font-medium">停车费</div>
+                                    <div class="text-xs text-gray-500">计费周期</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="text-right">
+                                    <div id="parking-remaining" class="text-xs text-gray-500">剩余天数：-</div>
+                                    <div id="parking-days" class="text-parking text-sm">未设置</div>
+                                </div>
+                                <i class="fa fa-chevron-right text-gray-400 text-xs ml-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据管理 -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">数据管理</h3>
+                    <div class="bg-white rounded-xl overflow-hidden">
+                        <button id="backupDataBtn" class="w-full flex items-center justify-between p-4 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fa fa-save mr-3 text-blue-500"></i>
+                                <span>备份数据到本地</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </button>
+                        <button id="restoreDataBtn" class="w-full flex items-center justify-between p-4 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fa fa-refresh mr-3 text-purple-500"></i>
+                                <span>从本地恢复数据</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </button>
+                        <button id="clearData" class="w-full flex flex-col items-start justify-between p-4">
+                            <div class="flex items-center w-full justify-between">
+                                <div class="flex items-center">
+                                    <i class="fa fa-trash mr-3 text-red-500"></i>
+                                    <span>清空所有数据</span>
+                                </div>
+                                <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                            </div>
+                            <div class="text-xs text-red-500 mt-1 w-full flex items-start">
+                                <i class="fa fa-exclamation-circle mr-2 mt-0.5"></i>
+                                <span>首次使用，请先清空所有数据再添加数据</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 隐私与法律 -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">隐私与法律</h3>
+                    <div class="bg-white rounded-xl overflow-hidden">
+                        <a href="setting/privacy.html" class="w-full flex items-center justify-between p-4 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fa fa-shield mr-3 text-blue-500"></i>
+                                <span>隐私政策</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </a>
+                        <a href="setting/terms.html" class="w-full flex items-center justify-between p-4 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fa fa-file-text-o mr-3 text-green-500"></i>
+                                <span>用户协议</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </a>
+                        <a href="setting/personal-info.html" class="w-full flex items-center justify-between p-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-list-alt mr-3 text-purple-500"></i>
+                                <span>个人信息收集清单</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 关于 -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">关于</h3>
+                    <div class="bg-white rounded-xl overflow-hidden">
+                        <div class="w-full flex items-center justify-between p-4 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fa fa-info-circle mr-3 text-gray-500"></i>
+                                <span>版本信息</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">v1.0.0</span>
+                        </div>
+                        <a href="setting/about.html" class="w-full flex items-center justify-between p-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-heart mr-3 text-red-500"></i>
+                                <span>关于我们</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="moduleTogglePage" class="page pt-2">
+            <div class="card p-4 mb-4 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base font-bold">首页模块显示开关</h2>
+                    <button id="backToSettings" class="text-primary">
+                        <i class="fa fa-arrow-left"></i> 返回
+                    </button>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div class="text-sm font-medium">本月水费</div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleWater" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div class="text-sm font-medium">本月电费</div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleElectricity" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div class="text-sm font-medium">本月燃气费</div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleGas" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div class="text-sm font-medium">本月物业费</div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleProperty" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div class="text-sm font-medium">本月停车费</div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleParking" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bg-white border-t border-gray-200 py-3">
+        <div class="flex justify-around px-2">
+            <div class="nav-item home" onclick="go('dashboard')">
+                <i class="fa fa-home text-lg"></i><span class="text-xs">首页</span>
+            </div>
+            <div class="nav-item chart" onclick="go('charts')">
+                <i class="fa fa-bar-chart text-lg"></i><span class="text-xs">统计</span>
+            </div>
+            <div class="nav-item record" onclick="go('records')">
+                <i class="fa fa-list-alt text-lg"></i><span class="text-xs">记录</span>
+            </div>
+            <div class="nav-item setting" onclick="go('settings')">
+                <i class="fa fa-cog text-lg"></i><span class="text-xs">设置</span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="editModal" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center">
+        <div class="ios-modal">
+            <h3 class="text-lg font-bold mb-4">添加缴费记录</h3>
+            <form id="editForm" class="space-y-4">
+                <input type="hidden" id="dataId">
+                <div class="relative">
+                    <input type="text" id="billDate" class="w-full ios-input" readonly placeholder="选择年月" required>
+                    <button type="button" id="yearMonthPickerBtn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <i class="fa fa-calendar"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label for="waterAmount" class="block text-sm font-medium text-water mb-1">水费</label>
+                        <input type="number" step="0.01" min="0" id="waterAmount" placeholder="水费金额" class="w-full ios-input">
+                        <div id="waterUsage" class="text-xs text-water mt-1 hidden">用水量：<span>0.00 m³</span></div>
+                    </div>
+                    
+                    <div>
+                        <label for="electricityAmount" class="block text-sm font-medium text-electricity mb-1">电费</label>
+                        <input type="number" step="0.01" min="0" id="electricityAmount" placeholder="电费金额" class="w-full ios-input">
+                        <div id="elecUsage" class="text-xs text-electricity mt-1 hidden">用电量：<span>0.00 kWh</span></div>
+                    </div>
+                    
+                    <div>
+                        <label for="gasAmount" class="block text-sm font-medium text-gas mb-1">燃气费</label>
+                        <input type="number" step="0.01" min="0" id="gasAmount" placeholder="燃气费金额" class="w-full ios-input">
+                        <div id="gasUsage" class="text-xs text-gas mt-1 hidden">用气量：<span>0.00 m³</span></div>
+                    </div>
+                    
+                    <div>
+                        <label for="propertyAmount" class="block text-sm font-medium text-property mb-1">物业费</label>
+                        <input type="number" step="0.01" min="0" id="propertyAmount" placeholder="物业费金额" class="w-full ios-input">
+                    </div>
+                    
+                    <div>
+                        <label for="parkingAmount" class="block text-sm font-medium text-parking mb-1">停车费</label>
+                        <input type="number" step="0.01" min="0" id="parkingAmount" placeholder="停车费金额" class="w-full ios-input">
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" id="closeModal" class="flex-1 ios-btn bg-gray-100">取消</button>
+                    <button type="submit" class="flex-1 ios-btn bg-primary text-white">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 日期选择弹窗 -->
+    <div id="date-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end justify-center">
+        <div class="bg-white rounded-t-2xl w-full">
+            <div class="flex justify-between items-center p-4 border-b">
+                <button id="date-modal-cancel" class="text-gray-500">取消</button>
+                <h3 id="modal-title" class="font-medium">物业费周期设置</h3>
+                <button id="date-modal-confirm" class="text-primary">确定</button>
+            </div>
+            <div class="p-4 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">开始日期</div>
+                        <div class="relative">
+                            <input type="text" id="start-date-display" class="w-full ios-input" readonly placeholder="选择日期">
+                            <button type="button" id="start-date-picker-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">结束日期</div>
+                        <div class="relative">
+                            <input type="text" id="end-date-display" class="w-full ios-input" readonly placeholder="选择日期">
+                            <button type="button" id="end-date-picker-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS风格日历选择器 -->
+    <div id="calendar-picker" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end justify-center">
+        <div class="bg-white rounded-t-2xl w-full max-h-[80vh]">
+            <div class="flex justify-between items-center p-4 border-b">
+                <button id="calendar-cancel" class="text-gray-500">取消</button>
+                <h3 id="calendar-title" class="font-medium">选择日期</h3>
+                <button id="calendar-confirm" class="text-primary">确定</button>
+            </div>
+            <div class="p-4">
+                <!-- 月份导航 -->
+                <div class="flex justify-between items-center mb-4">
+                    <button id="prev-month" class="p-2">
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <div id="current-month" class="font-medium"></div>
+                    <button id="next-month" class="p-2">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- 星期标题 -->
+                <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div class="text-center text-xs text-gray-500">日</div>
+                    <div class="text-center text-xs text-gray-500">一</div>
+                    <div class="text-center text-xs text-gray-500">二</div>
+                    <div class="text-center text-xs text-gray-500">三</div>
+                    <div class="text-center text-xs text-gray-500">四</div>
+                    <div class="text-center text-xs text-gray-500">五</div>
+                    <div class="text-center text-xs text-gray-500">六</div>
+                </div>
+                <!-- 日历网格 -->
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+                <!-- 底部按钮 -->
+                <div class="flex gap-2 mt-4">
+                    <button id="calendar-clear" class="flex-1 py-2 border border-gray-200 rounded-lg text-gray-500">清除</button>
+                    <button id="calendar-today" class="flex-1 py-2 border border-gray-200 rounded-lg text-gray-700">今天</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS风格年月选择器 -->
+    <div id="yearMonth-picker" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end justify-center">
+        <div class="bg-white rounded-t-2xl w-full">
+            <div class="flex justify-between items-center p-4 border-b">
+                <button id="yearMonth-cancel" class="text-gray-500">取消</button>
+                <h3 id="yearMonth-title" class="font-medium">选择年月</h3>
+                <button id="yearMonth-confirm" class="text-primary">确定</button>
+            </div>
+            <div class="p-4">
+                <!-- 年份显示 -->
+                <div class="text-center text-lg font-medium mb-6" id="current-year-month"></div>
+                
+                <!-- 年份选择 -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <button id="prev-year" class="p-2">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <div class="text-sm text-gray-500">年份</div>
+                        <button id="next-year" class="p-2">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2" id="year-grid"></div>
+                </div>
+                
+                <!-- 月份选择 -->
+                <div>
+                    <div class="text-sm text-gray-500 mb-2">月份</div>
+                    <div class="grid grid-cols-4 gap-2" id="month-grid"></div>
+                </div>
+                
+                <!-- 底部按钮 -->
+                <div class="flex gap-2 mt-6">
+                    <button id="yearMonth-clear" class="flex-1 py-2 border border-gray-200 rounded-lg text-gray-500">清除</button>
+                    <button id="yearMonth-current" class="flex-1 py-2 border border-gray-200 rounded-lg text-gray-700">本月</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

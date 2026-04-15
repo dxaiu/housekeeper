@@ -1,0 +1,138 @@
+{
+    "name" : "生活管家",
+    "short_name" : "生活管家",
+    "description" : "生活缴费记录管家 - 轻松管理您的水费、电费、燃气费等生活缴费",
+    "start_url" : "/index.html",
+    "display" : "standalone",
+    "background_color" : "#ffffff",
+    "theme_color" : "#1677ff",
+    "icons" : [
+        {
+            "src" : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231677ff;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23722ED1;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23grad1)'/%3E%3Cpath d='M400 256L256 128L112 256V400H400V256Z' fill='white'/%3E%3Cpath d='M256 128V256' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M256 256V400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M112 320H400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Crect x='176' y='280' width='160' height='80' rx='8' fill='%23f0f0f0'/%3E%3Cline x1='192' y1='304' x2='320' y2='304' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='320' x2='304' y2='320' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='336' x2='288' y2='336' stroke='%231677ff' stroke-width='4'/%3E%3C/svg%3E",
+            "sizes" : "512x512",
+            "type" : "image/svg+xml",
+            "purpose" : "any maskable"
+        },
+        {
+            "src" : "icon.svg",
+            "sizes" : "192x192",
+            "type" : "image/svg+xml",
+            "purpose" : "any"
+        }
+    ],
+    "orientation" : "portrait",
+    "categories" : [ "utilities", "finance", "lifestyle" ],
+    "prefer_related_applications" : false,
+    "related_applications" : [],
+    "shortcuts" : [
+        {
+            "name" : "记录缴费",
+            "short_name" : "记录",
+            "description" : "快速记录缴费信息",
+            "url" : "/index.html?page=records",
+            "icons" : [
+                {
+                    "src" : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231677ff'%3E%3Cpath d='M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 15H6V9H8V15ZM12 15H10V9H12V15ZM16 15H14V9H16V15Z'/%3E%3C/svg%3E",
+                    "sizes" : "192x192"
+                }
+            ]
+        },
+        {
+            "name" : "查看统计",
+            "short_name" : "统计",
+            "description" : "查看缴费统计数据",
+            "url" : "/index.html?page=charts",
+            "icons" : [
+                {
+                    "src" : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23722ED1'%3E%3Cpath d='M3 13H11V11H3V13ZM3 6V8H21V6H3ZM3 18V20H17V18H3Z'/%3E%3C/svg%3E",
+                    "sizes" : "192x192"
+                }
+            ]
+        }
+    ],
+    "lang" : "zh-CN",
+    "dir" : "ltr",
+    "screenshots" : [],
+    "iarc_rating_id" : "",
+    "msapplication-TileColor" : "#1677ff",
+    "msapplication-TileImage" : "icon.svg",
+    "apple-mobile-web-app-capable" : "yes",
+    "apple-mobile-web-app-status-bar-style" : "black-translucent",
+    "apple-mobile-web-app-title" : "生活管家",
+    "apple-touch-icon" : "icon.svg",
+    "x5-fullscreen" : "true",
+    "x5-page-mode" : "app",
+    "uni-app" : {
+        "name" : "生活管家",
+        "appid" : "H5D8DFC84",
+        "description" : "生活缴费记录管家",
+        "versionName" : "1.0.0",
+        "versionCode" : "100",
+        "transformPx" : true,
+        "app-plus" : {
+            "usingComponents" : true,
+            "nvueCompiler" : "uni-app",
+            "compilerVersion" : 3,
+            "splashscreen" : {
+                "alwaysShowBeforeRender" : true,
+                "autoclose" : true,
+                "waiting" : true,
+                "redirection" : true
+            },
+            "runmode" : "liberate",
+            "uniStatistics" : {
+                "enable" : true
+            },
+            "signature" : "",
+            "privacy" : {
+                "prompt" : "template",
+                "template" : {
+                    "title" : "隐私政策",
+                    "message" : "本应用需要访问您的本地存储，用于保存缴费记录数据。",
+                    "buttonAccept" : "同意",
+                    "buttonRefuse" : "拒绝"
+                }
+            }
+        },
+        "h5" : {
+            "router" : {
+                "mode" : "hash"
+            },
+            "title" : "生活管家",
+            "domain" : "",
+            "cdn" : "",
+            "template" : "",
+            "devServer" : {
+                "https" : false
+            }
+        },
+        "mp-weixin" : {
+            "appid" : "",
+            "setting" : {
+                "urlCheck" : false
+            },
+            "usingComponents" : true
+        }
+    },
+    "id" : "H5D8DFC84",
+    "version" : {
+        "name" : "1.0.0",
+        "code" : 100
+    },
+    "launch_path" : "index.html",
+    "plus" : {
+        "distribute" : {
+            "icons" : {
+                "android" : {
+                    "hdpi" : "icons/mipmap-hdpi/ic_launcher.png",
+                    "xhdpi" : "icons/mipmap-xhdpi/ic_launcher.png",
+                    "xxhdpi" : "icons/mipmap-xxhdpi/ic_launcher.png",
+                    "xxxhdpi" : "icons/mipmap-xxxhdpi/ic_launcher.png"
+                }
+            },
+            "google" : {
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ]
+            }
+        }
+    }
+}
