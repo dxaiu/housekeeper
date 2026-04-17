@@ -23,10 +23,11 @@
     <!-- 360 浏览器标签 -->
     <meta name="screen-orientation" content="portrait">
     <!-- 应用图标 -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231677ff;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23722ED1;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23grad1)'/%3E%3Cpath d='M400 256L256 128L112 256V400H400V256Z' fill='white'/%3E%3Cpath d='M256 128V256' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M256 256V400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M112 320H400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Crect x='176' y='280' width='160' height='80' rx='8' fill='%23f0f0f0'/%3E%3Cline x1='192' y1='304' x2='320' y2='304' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='320' x2='304' y2='320' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='336' x2='288' y2='336' stroke='%231677ff' stroke-width='4'/%3E%3C/svg%3E" type="image/svg+xml">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="./icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231677ff;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23722ED1;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23grad1)'/%3E%3Cpath d='M400 256L256 128L112 256V400H400V256Z' fill='white'/%3E%3Cpath d='M256 128V256' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M256 256V400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M112 320H400' stroke='white' stroke-width='16' stroke-linecap='round'/%3E%3Crect x='176' y='280' width='160' height='80' rx='8' fill='%23f0f0f0'/%3E%3Cline x1='192' y1='304' x2='320' y2='304' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='320' x2='304' y2='320' stroke='%231677ff' stroke-width='4'/%3E%3Cline x1='192' y1='336' x2='288' y2='336' stroke='%231677ff' stroke-width='4'/%3E%3C/svg%3E">
-    <!-- 加载CDN资源 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- 加载本地资源（支持 file:// 和 HTTP/HTTPS） -->
+    <link rel="stylesheet" href="./lib/font-awesome.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -51,8 +52,8 @@
             }
         }
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.8/chart.umd.min.js"></script>
+    <script src="./lib/xlsx.full.min.js"></script>
+    <script src="./lib/chart.umd.min.js"></script>
 
     <style type="text/tailwindcss">
         @layer utilities {

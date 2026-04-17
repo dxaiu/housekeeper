@@ -13,15 +13,14 @@ const STATIC_ASSETS = [
   './ui/uiManager.js',
   './app.js',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './lib/font-awesome.min.css',
+  './lib/fonts/fontawesome-webfont.woff2',
+  './lib/xlsx.full.min.js',
+  './lib/chart.umd.min.js'
 ];
 
-// 外部CDN资源（用于离线缓存）
-const CDN_ASSETS = [
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.8/chart.umd.min.js'
-];
+const CDN_ASSETS = [];
 
 // 安装 Service Worker
 self.addEventListener('install', (event) => {

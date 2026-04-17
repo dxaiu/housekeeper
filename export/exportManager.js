@@ -243,7 +243,6 @@ const ExportManager = {
     },
 
     restoreData() {
-        // 创建文件选择输入
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
@@ -255,61 +254,64 @@ const ExportManager = {
                 const reader = new FileReader();
                 reader.onload = async (event) => {
                     try {
-                        const backupData = JSON.parse(event.target.result);
-
-                        // 验证备份数据格式
-                        if (!backupData.version || !backupData.data || !Array.isArray(backupData.data.bills)) {
-                            alert('备份文件格式错误');
+                        let backupData;
+                        try {
+                            backupData = JSON.parse(event.target.result);
+                        } catch (parseErr) {
+                            console.error('JSON解析失败:', parseErr);
+                            alert('备份文件解析失败，请确保选择正确的JSON备份文件');
                             return;
                         }
 
-                        // 确认恢复
+                        console.log('解析到的备份数据:', backupData);
+
+                        // 兼容多种备份格式
+                        const data = backupData.data || backupData;
+                        const bills = data.bills || data.records || data;
+
+                        // 验证备份数据格式（放宽条件）
+                        if (!Array.isArray(bills) || bills.length === 0) {
+                            alert('备份文件中没有找到有效的缴费记录数据');
+                            return;
+                        }
+
                         if (!confirm('确定要恢复数据吗？这将覆盖当前所有数据')) {
                             return;
                         }
 
-                        // 清空当前数据
                         await DataManager.clearAll();
 
-                        // 恢复缴费记录
-                        for (const bill of backupData.data.bills) {
-                            await DataManager.save(bill);
+                        for (const bill of bills) {
+                            if (bill && (bill.date || bill.amount !== undefined)) {
+                                await DataManager.save(bill);
+                            }
                         }
 
-                        // 恢复缴费周期设置
-                        if (backupData.data.propertyCycle) {
-                            localStorage.setItem('propertyCycle', JSON.stringify(backupData.data.propertyCycle));
+                        if (data.propertyCycle) {
+                            localStorage.setItem('propertyCycle', JSON.stringify(data.propertyCycle));
                         }
-                        if (backupData.data.parkingCycle) {
-                            localStorage.setItem('parkingCycle', JSON.stringify(backupData.data.parkingCycle));
+                        if (data.parkingCycle) {
+                            localStorage.setItem('parkingCycle', JSON.stringify(data.parkingCycle));
                         }
-
-                        // 恢复模块开关状态
-                        if (backupData.data.moduleVisibility) {
-                            localStorage.setItem('moduleVisibility', JSON.stringify(backupData.data.moduleVisibility));
+                        if (data.moduleVisibility) {
+                            localStorage.setItem('moduleVisibility', JSON.stringify(data.moduleVisibility));
                         }
-
-                        // 恢复单价设置
-                        if (backupData.data.priceSettings) {
-                            localStorage.setItem('priceSettings', JSON.stringify(backupData.data.priceSettings));
+                        if (data.priceSettings) {
+                            localStorage.setItem('priceSettings', JSON.stringify(data.priceSettings));
                         }
 
                         alert('数据恢复成功，页面将刷新');
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
+                        setTimeout(() => { location.reload(); }, 1000);
                     } catch (error) {
-                        console.error('Error parsing backup data:', error);
-                        alert('备份文件解析失败');
+                        console.error('Error processing backup data:', error);
+                        alert('数据处理失败: ' + (error.message || '未知错误'));
                     }
                 };
-                reader.onerror = () => {
-                    alert('文件读取失败');
-                };
+                reader.onerror = () => { alert('文件读取失败'); };
                 reader.readAsText(file);
             } catch (error) {
                 console.error('Error restoring data:', error);
-                alert('恢复失败，请稍后重试');
+                alert('恢复失败: ' + (error.message || '未知错误'));
             }
         };
         input.click();

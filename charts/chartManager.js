@@ -1,10 +1,30 @@
 const ChartManager = {
+    _chartRetryCount: 0,
+    _maxRetries: 20,
+
     async drawChart() {
         try {
             const ctx = document.getElementById('mainChart');
             if (!ctx) return;
             const context = ctx.getContext('2d');
             if (!context) return;
+
+            if (typeof Chart === 'undefined') {
+                this._chartRetryCount++;
+                if (this._chartRetryCount <= this._maxRetries) {
+                    console.warn(`Chart.js 尚未加载，等待加载后重试... (${this._chartRetryCount}/${this._maxRetries})`);
+                    setTimeout(() => this.drawChart(), 500);
+                } else {
+                    console.error('Chart.js 加载失败，已达到最大重试次数。请检查网络连接或刷新页面重试。');
+                    const chartEl = document.getElementById('mainChart');
+                    if (chartEl) {
+                        chartEl.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-sm"><i class="fa fa-exclamation-triangle mr-2"></i>图表加载失败，请刷新页面</div>';
+                    }
+                }
+                return;
+            }
+
+            this._chartRetryCount = 0;
 
             const bills = await DataManager.getBills();
             const chartYear = document.getElementById('chartYearFilter').value;
